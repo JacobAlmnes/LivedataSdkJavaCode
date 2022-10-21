@@ -2,14 +2,22 @@ package com.sportradar.sdk.example;
 
 import com.sportradar.sdk.common.enums.FeedEventType;
 import com.sportradar.sdk.feed.common.entities.EventIdentifier;
-import com.sportradar.sdk.feed.livescout.entities.*;
+import com.sportradar.sdk.feed.livescout.entities.LineupsEntity;
+import com.sportradar.sdk.feed.livescout.entities.MatchBookingEntity;
+import com.sportradar.sdk.feed.livescout.entities.MatchDataEntity;
+import com.sportradar.sdk.feed.livescout.entities.MatchListEntity;
+import com.sportradar.sdk.feed.livescout.entities.MatchListUpdateEntity;
+import com.sportradar.sdk.feed.livescout.entities.MatchStopEntity;
+import com.sportradar.sdk.feed.livescout.entities.MatchUpdateEntity;
+import com.sportradar.sdk.feed.livescout.entities.OddsSuggestionsEntity;
+import com.sportradar.sdk.feed.livescout.entities.ScoreEntity;
+import com.sportradar.sdk.feed.livescout.entities.ScoutEventEntity;
+import com.sportradar.sdk.feed.livescout.entities.ServerTimeEntity;
 import com.sportradar.sdk.feed.livescout.interfaces.LiveScoutFeed;
 import com.sportradar.sdk.feed.livescout.interfaces.LiveScoutFeedListener;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Timer;
 
 public class LiveScoutFeedListenerImpl implements LiveScoutFeedListener {
 
@@ -129,24 +137,19 @@ public class LiveScoutFeedListenerImpl implements LiveScoutFeedListener {
     @Override
     public void onMatchListReceived(LiveScoutFeed sender, MatchListEntity matchList) {
         logger.info("matchlist received");
-//        for(MatchUpdateEntity match : matchList.getMatches()){
-//            logger.info(match.toString());
-//        }
+        for(MatchUpdateEntity match : matchList.getMatches()){
+            logger.info(match.toString());
+        }
         final List<MatchUpdateEntity> matches = matchList.getMatches();
+
         EventIdentifier[] toSubscribe = new EventIdentifier[matches.size()];
         for (int i = 0; i < matches.size(); i++) {
             final MatchUpdateEntity element = matches.get(i);
-            if (Boolean.FALSE.equals(element.getMatchHeader().isBooked())) {
-                sender.bookMatches(new EventIdentifier[]{element.getEventId()});
+            if (element.getMatchHeader().isBooked()) {
+                toSubscribe[i] = element.getEventId();
             }
-            toSubscribe[i] = element.getEventId();
         }
         sender.subscribe(toSubscribe);
-//        sender.subscribe(new EventIdentifier[]{EventIdentifier.id(23053636)});
-//        sender.subscribe(new EventIdentifier[]{EventIdentifier.id(22878272)});
-
-//        sender.subscribe(new EventIdentifier[]{EventIdentifier.id(29702834)});
-//        sender.subscribe(new EventIdentifier[]{EventIdentifier.id(30723617)});
     }
 
     @Override
